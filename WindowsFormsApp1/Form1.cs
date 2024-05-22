@@ -451,8 +451,28 @@ namespace WindowsFormsApp1
         private void SaveAppConfig()
         {
             // 修改配置
-            ConfigurationManager.AppSettings["MiniSizeTipMenuItemChecked"] = miniSizeTipMenuItemChecked.ToString();
-            ConfigurationManager.RefreshSection("appSettings");
+            UpdateAppSettings("MiniSizeTipMenuItemChecked", miniSizeTipMenuItemChecked.ToString());
+        }
+
+        private void UpdateAppSettings(string key, string value)
+        {
+            // 打开配置文件
+            var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = configFile.AppSettings.Settings;
+
+            // 修改设置
+            if (settings[key] == null)
+            {
+                settings.Add(key, value);
+            }
+            else
+            {
+                settings[key].Value = value;
+            }
+
+            // 保存并刷新配置文件
+            configFile.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
         }
 
         private void frmMain_KeyDown(object sender, KeyEventArgs e)
